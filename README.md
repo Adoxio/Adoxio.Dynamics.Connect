@@ -1,4 +1,4 @@
-#Adoxio Connect Framework for Dynamics 365
+# Adoxio Connect Framework for Dynamics 365
 
 Implements OrganizationWebProxyClient with Dynamics 365 Server-to-Server authentication.
 
