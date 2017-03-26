@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Adoxio.Dynamics.Connect</id>
+    <version>0.4.1</version>
+    <title>Adoxio.Dynamics.Connect</title>
+    <authors>Adoxio Business Solutions</authors>
+    <owners>Adoxio Business Solutions</owners>
+    <licenseUrl>https://github.com/Adoxio/Adoxio.Dynamics.Connect/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/Adoxio/Adoxio.Dynamics.Connect</projectUrl>
+    <iconUrl>https://www.adoxio.com/adoxio-icon.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>
+      Implements OrganizationWebProxyClient with Dynamics 365 Server-to-Server authentication.
+    </description>
+    <releaseNotes>
+      0.3.3 - Initial public release of Adoxio Connect Framework for Dynamics 365.
+      0.4.0 - Add Unit Test project with constructor and S2SAppSetting tests, add and update CrmContext constructors to standard pattern, add assert of S2SAppSettings, add reset token cache method to allow manual clearing of ADAL token cache
+      0.4.1 - Fix parameter order on string create method of CrmContext, resolve public key signing issue
+    </releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>dynamics365 crm</tags>
+    <dependencies>
+      <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="8.2.0.2" />
+      <dependency id="Microsoft.IdentityModel.Clients.ActiveDirectory" version="2.22.302111727" />
+      <dependency id="Newtonsoft.Json" version="9.0.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="src\Adoxio.Dynamics.Connect\bin\Release\Adoxio.Dynamics.Connect.dll" target="lib\net461"/>
+  </files>
+</package>

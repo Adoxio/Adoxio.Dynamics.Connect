@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Adoxio.Dynamics.Connect, Version=0.3.1.2066, Culture=neutral, PublicKeyToken=f4f0f32a8a5796b8, processorArchitecture=MSIL">
-      <HintPath>..\packages\Adoxio.Dynamics.Connect.0.3.3\lib\net461\Adoxio.Dynamics.Connect.dll</HintPath>
+    <Reference Include="Adoxio.Dynamics.Connect, Version=0.4.1.29718, Culture=neutral, PublicKeyToken=f4f0f32a8a5796b8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Adoxio.Dynamics.Connect.0.4.1\lib\net461\Adoxio.Dynamics.Connect.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=8.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.CrmSdk.CoreAssemblies.8.2.0.2\lib\net452\Microsoft.Crm.Sdk.Proxy.dll</HintPath>

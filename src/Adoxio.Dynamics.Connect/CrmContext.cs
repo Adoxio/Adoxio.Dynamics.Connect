@@ -102,9 +102,9 @@ namespace Adoxio.Dynamics.Connect
             return new CrmContext();
         }
 
-        public static CrmContext Create(string resource, string clientId, string clientSecret, string tenantId)
+        public static CrmContext Create(string clientId, string clientSecret, string resource, string tenantId)
         {
-            return new CrmContext(resource, clientId, clientSecret, tenantId);
+            return new CrmContext(clientId, clientSecret, resource, tenantId);
         }
 
         public static CrmContext Create(S2SAppSettings settings)
