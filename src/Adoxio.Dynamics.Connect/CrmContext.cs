@@ -17,47 +17,40 @@ namespace Adoxio.Dynamics.Connect
         private OrganizationServiceContext _organizationServiceContext;
         private readonly string _resource;
         private string _token;
-        private readonly Func<string, string> _getToken;
-        private readonly SettingManager.S2SAppSettings _appSettings;
+        private readonly Func<S2SAppSettings, string> _getToken;
+        private static S2SAppSettings _appSettings;
+        private static AuthenticationContext _authContext;
 
-        public CrmContext()
+        public CrmContext() : this(SettingManager.GetAppSettings()) { }
+
+        public CrmContext(string clientId, string clientSecret, string resource, string tenantId, Func<S2SAppSettings, string> getToken = null) 
+            : this(new S2SAppSettings()
+                {
+                    ClientId = clientId,
+                    ClientSecret = clientSecret,
+                    Resource = resource,
+                    TenantId = tenantId
+                }, getToken)
+        { }
+
+        public CrmContext(S2SAppSettings settings, Func<S2SAppSettings, string> getToken = null)
         {
-            _appSettings = SettingManager.GetAppSettings();
-            Trace.TraceInformation("CrmContext set app settings");
-
-            if (_appSettings == null)
+            if (_appSettings == null || !_appSettings.Equals(settings))
             {
-                throw new Exception("no app settings in config or settings.json");
+                settings.AssertAppSettings();
             }
+            _appSettings = settings;
 
-            _resource = _appSettings.Resource;
+            _resource = settings.Resource;
             Trace.TraceInformation($"CrmContext set instance: {_resource}");
 
-            _getToken = GetDefaultToken;
-        }
-
-        private string GetDefaultToken(string resource)
-        {
-            var authority = $"{AadInstance}{_appSettings.TenantId}";
-            var authContext = new AuthenticationContext(authority);
-            Trace.TraceInformation($"CrmContext set auth context: {authority}");
-            var result = authContext.AcquireToken(_appSettings.Resource,
-                        new ClientCredential(_appSettings.ClientId, _appSettings.ClientSecret));
-            Trace.TraceInformation($"ADAL AcquireToken complete");
-
-            return result.AccessToken;
+            _getToken = getToken == null ? GetDefaultToken : getToken;
         }
 
         public CrmContext(string resource, string token)
         {
             _resource = resource;
             _token = token;
-        }
-
-        public CrmContext(string resource, Func<string, string> getToken = null)
-        {
-            _resource = resource;
-            _getToken = getToken;
         }
 
         public OrganizationWebProxyClient WebProxyClient
@@ -79,7 +72,7 @@ namespace Adoxio.Dynamics.Connect
                 if (string.IsNullOrEmpty(token))
                 {
                     Trace.TraceInformation("Execute GetToken");
-                    token = _getToken(_resource);
+                    token = _getToken(_appSettings);
                 }
 
                 // add latest token token to client header
@@ -109,11 +102,68 @@ namespace Adoxio.Dynamics.Connect
             return new CrmContext();
         }
 
+        public static CrmContext Create(string resource, string clientId, string clientSecret, string tenantId)
+        {
+            return new CrmContext(resource, clientId, clientSecret, tenantId);
+        }
+
+        public static CrmContext Create(S2SAppSettings settings)
+        {
+            return new CrmContext(settings);
+        }
+
         public void Dispose()
         {
-            _organizationWebProxyClient?.Dispose();
-            _organizationServiceContext?.Dispose();
-            Trace.TraceInformation("WebProxyClient and ServiceContext disposed");
+            Dispose(true);
+            GC.SuppressFinalize(this);
+            Trace.TraceInformation("CrmContext dispose complete");
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _organizationWebProxyClient?.Dispose();
+                _organizationServiceContext?.Dispose();
+                Trace.TraceInformation("WebProxyClient and ServiceContext disposed");
+            }
+        }
+
+        public void ResetTokenCache()
+        {
+            if (_authContext != null)
+            {
+                _authContext.TokenCache.Clear();
+                Trace.TraceInformation("ADAL TokenCache cleared");
+            }
+        }
+
+        internal void ResetAll()
+        {
+            ResetTokenCache();
+            _appSettings = null;
+            _authContext = null;
+            Trace.TraceInformation("Reset complete");
+        }
+
+        #region private helpers
+
+        private string GetDefaultToken(S2SAppSettings settings)
+        {
+            var authority = $"{AadInstance}{settings.TenantId}";
+
+            if (_authContext == null || !_authContext.Authority.Contains(authority))
+            {
+                _authContext = new AuthenticationContext(authority);
+                Trace.TraceInformation($"CrmContext set auth context: {authority}");
+            }
+            var result = _authContext.AcquireToken(settings.Resource,
+                        new ClientCredential(settings.ClientId, settings.ClientSecret));
+            Trace.TraceInformation($"ADAL AcquireToken complete");
+
+            return result.AccessToken;
+        }
+
+        #endregion
     }
 }

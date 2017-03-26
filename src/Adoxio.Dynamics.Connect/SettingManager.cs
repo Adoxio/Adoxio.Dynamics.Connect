@@ -9,16 +9,8 @@ using Newtonsoft.Json;
 
 namespace Adoxio.Dynamics.Connect
 {
-    public static class SettingManager
+    public static partial class SettingManager
     {
-        public class S2SAppSettings
-        {
-            public string ClientId { get; set; }
-            public string ClientSecret { get; set; }
-            public string TenantId { get; set; }
-            public string Resource { get; set; }
-        }
-
         private static readonly string _settingClientId = "dyn:ClientId";
         private static readonly string _settingClientSecret = "dyn:ClientSecret";
         private static readonly string _settingResource = "dyn:Resource";
@@ -77,7 +69,7 @@ namespace Adoxio.Dynamics.Connect
 
         public static bool InitAppSettings()
         {
-            if (ValidateAppSettings(GetAppSettings()))
+            if (GetAppSettings().ValidateAppSettings())
             {
                 return true;
             }
@@ -90,29 +82,9 @@ namespace Adoxio.Dynamics.Connect
             return false;
         }
 
-        private static bool ValidateAppSettings(S2SAppSettings appSettings)
-        {
-            if (string.IsNullOrEmpty(appSettings.ClientId))
-            {
-                return false;
-            }
-            if (string.IsNullOrEmpty(appSettings.ClientSecret))
-            {
-                return false;
-            }
-            if (string.IsNullOrEmpty(appSettings.Resource))
-            {
-                return false;
-            }
-            if (string.IsNullOrEmpty(appSettings.TenantId))
-            {
-                return false;
-            }
-            return true;
-        }
-
         public static bool LoadConfigAppSettings(S2SAppSettings appSettings)
         {
+            Trace.TraceInformation("Start load/set with ConfigurationManager of app settings");
             try
             {
                 ConfigurationManager.AppSettings[_settingClientId] = appSettings.ClientId;
